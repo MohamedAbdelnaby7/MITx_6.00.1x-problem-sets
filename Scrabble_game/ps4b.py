@@ -4,18 +4,18 @@ import time
 
 # Computer chooses a word
 
-def compChooseWord(hand, wordList, n):
+def compChooseWord(hand, wordDoc, n):
     """
-    Given a hand and a wordList, find the word that gives 
+    Given a hand and a wordDoc, find the word that gives 
     the maximum value score, and return it.
 
     This word should be calculated by considering all the words
-    in the wordList.
+    in the wordDoc.
 
-    If no words in the wordList can be made from the hand, return None.
+    If no words in the wordDoc can be made from the hand, return None.
 
     hand: dictionary (string -> int)
-    wordList: list (string)
+    wordDoc: Dictionary (string -> int)
     n: integer (HAND_SIZE; i.e., hand size required for additional points)
 
     returns: string or None
@@ -24,12 +24,12 @@ def compChooseWord(hand, wordList, n):
     bestScore = 0
     # Create a new variable to store the best word seen so far (initially None)  
     bestWord = None
-    # For each word in the wordList
+    # For each word in the wordDoc
     for word in wordList:
-        # If you can construct the word from your hand
+        # If you can construct the word from your hand.
         if isValidWord(word, hand, wordList):
             # find out how much making that word is worth
-            score = getWordScore(word, n)
+            score = wordDoc[word]
             # If the score for that word is higher than your best score
             if (score > bestScore):
                 # update your best score, and best word accordingly
@@ -40,7 +40,7 @@ def compChooseWord(hand, wordList, n):
 
 
 # Computer plays a hand
-def compPlayHand(hand, wordList, n):
+def compPlayHand(hand, wordDoc, n):
     """
     Allows the computer to play the given hand, following the same procedure
     as playHand, except instead of the user choosing a word, the computer 
@@ -56,7 +56,7 @@ def compPlayHand(hand, wordList, n):
     choices (i.e. compChooseWord returns None).
  
     hand: dictionary (string -> int)
-    wordList: list (string)
+    wordDoc: Dictionary (string -> int)
     n: integer (HAND_SIZE; i.e., hand size required for additional points)
     """
     # Keep track of the total score
@@ -67,7 +67,7 @@ def compPlayHand(hand, wordList, n):
         print("Current Hand: ", end=' ')
         displayHand(hand)
         # computer's word
-        word = compChooseWord(hand, wordList, n)
+        word = compChooseWord(hand, wordDoc, n)
         # If the input is a single period:
         if word == None:
             # End the game (break out of the loop)
@@ -82,7 +82,7 @@ def compPlayHand(hand, wordList, n):
             # Otherwise (the word is valid):
             else :
                 # Tell the user how many points the word earned, and the updated total score 
-                score = getWordScore(word, n)
+                score = wordDoc[word]
                 totalScore += score
                 print('"' + word + '" earned ' + str(score) + ' points. Total: ' + str(totalScore) + ' points')              
                 # Update hand and show the updated hand to the user
@@ -92,7 +92,7 @@ def compPlayHand(hand, wordList, n):
     print('Total score: ' + str(totalScore) + ' points.')
 
     
-def playGame(wordList):
+def playGame():
     """
     Allow the user to play an arbitrary number of hands.
  
@@ -143,17 +143,21 @@ def playGame(wordList):
                     first = False
             elif uc == 'c':
                 if char == 'r':
-                    f[1](hand, wordList, HAND_SIZE)
+                    f[1](hand, wordDoc, HAND_SIZE)
                 elif char == 'n':            
                     hand = dealHand(HAND_SIZE)
-                    f[1](hand, wordList, HAND_SIZE)
+                    f[1](hand, wordDoc, HAND_SIZE)
                     first = False
                 
 
-        
+def listTODoc(wordList):
+    res_dct = {wordList[i]: getWordScore(wordList[i], HAND_SIZE) for i in range(0, len(wordList))}
+    return res_dct
+    
 #
 # Build data structures used for entire session and play game
 #
 if __name__ == '__main__':
     wordList = loadWords()
-    playGame(wordList)
+    wordDoc = listTODoc(wordList)
+    playGame()
